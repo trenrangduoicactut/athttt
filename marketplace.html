@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace — SoundChain</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.page-header {
+  padding: 7rem 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.filter-btn {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(99,210,255,0.06);
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+.search-wrap input {
+  padding-left: 36px;
+}
+.search-wrap::before {
+  content: '⌕';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 16px;
+  z-index: 1;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar {
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+}
+
+.sidebar-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 12px;
+}
+
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.sidebar-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  transition: color 0.2s;
+}
+.sidebar-option:hover { color: var(--text); }
+
+.sidebar-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  border-radius: 3px;
+}
+
+.price-range {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.price-range input { padding: 7px 10px; font-size: 12px; }
+
+/* NFT GRID */
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.nft-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.nft-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+.nft-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nft-cover .play-btn {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.nft-card:hover .play-btn { opacity: 1; }
+
+.nft-cover .verified-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(16,185,129,0.15);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+
+.nft-info {
+  padding: 14px;
+}
+
+.nft-artist {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.nft-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nft-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nft-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.nft-price-label { font-size: 10px; color: var(--text3); margin-bottom: 1px; }
+
+.nft-editions { font-size: 11px; color: var(--text3); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  flex-shrink: 0;
+}
+
+.modal-meta { flex: 1; }
+.modal-artist { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+.modal-title { font-family: var(--font-display); font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+
+.modal-body { padding: 24px; }
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.data-row:last-child { border-bottom: none; }
+.data-label { color: var(--text3); }
+.data-value { color: var(--text); font-family: var(--font-mono); word-break: break-all; max-width: 60%; text-align: right; }
+.data-value.hash { font-size: 11px; color: var(--accent); }
+.data-value.verified { color: var(--green); }
+
+.buy-section {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text2);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* TX TOAST */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--card2);
+  border: 1px solid var(--green);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  z-index: 300;
+  font-size: 13px;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  min-width: 280px;
+}
+.toast.show { transform: translateX(0); }
+.toast-title { font-weight: 700; color: var(--green); margin-bottom: 4px; }
+.toast-hash { font-size: 11px; color: var(--text3); word-break: break-all; }
+
+@media (max-width: 768px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb" style="width:500px;height:500px;background:rgba(99,210,255,0.03);top:10%;right:-150px;"></div>
+<div class="orb" style="width:400px;height:400px;background:rgba(168,85,247,0.04);bottom:20%;left:-100px;"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Sound<span>Chain</span></a>
+  <ul class="nav-links">
+    <li><a href="marketplace.html" class="active">Marketplace</a></li>
+    <li><a href="artist.html">Artist Studio</a></li>
+    <li><a href="collection.html">My Collection</a></li>
+  </ul>
+  <div class="nav-right">
+    <span style="font-size:11px;color:var(--text3);">Sepolia Testnet</span>
+    <a href="#" class="btn btn-outline btn-sm" onclick="showWallet()">0x4f3c...8a1b</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <div class="hero-eyebrow" style="margin-bottom:0.5rem;">2,847 NFTs trên Blockchain</div>
+      <h1 style="font-family:var(--font-display);font-size:36px;font-weight:800;">Marketplace</h1>
+    </div>
+    <div class="stats-row" style="flex:none;">
+      <div class="stat-item" style="padding:0.8rem 1.2rem;">
+        <div class="stat-value" style="font-size:18px;">127</div>
+        <div class="stat-label">Đang bán</div>
+      </div>
+      <div class="stat-item" style="padding:0.8rem 1.2rem;">
+        <div class="stat-value" style="font-size:18px;">0.08 ETH</div>
+        <div class="stat-label">Giá sàn</div>
+      </div>
+      <div class="stat-item" style="padding:0.8rem 1.2rem;">
+        <div class="stat-value" style="font-size:18px;">24h ↑12%</div>
+        <div class="stat-label">Volume</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <input type="text" placeholder="Tìm nghệ sĩ, bài hát...">
+    </div>
+    <button class="filter-btn active" onclick="filterCat(this,'all')">Tất cả</button>
+    <button class="filter-btn" onclick="filterCat(this,'pop')">Pop</button>
+    <button class="filter-btn" onclick="filterCat(this,'ballad')">Ballad</button>
+    <button class="filter-btn" onclick="filterCat(this,'edm')">EDM</button>
+    <button class="filter-btn" onclick="filterCat(this,'indie')">Indie</button>
+    <select style="width:auto;padding:7px 12px;font-size:12px;">
+      <option>Sắp xếp: Mới nhất</option>
+      <option>Giá: Thấp → Cao</option>
+      <option>Giá: Cao → Thấp</option>
+      <option>Bán chạy nhất</option>
+    </select>
+  </div>
+</div>
+
+<div class="main-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Trạng thái</div>
+      <label class="sidebar-option"><input type="checkbox" checked> Đang bán</label>
+      <label class="sidebar-option"><input type="checkbox"> Đã bán</label>
+      <label class="sidebar-option"><input type="checkbox"> Có Offer</label>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Khoảng giá (ETH)</div>
+      <div class="price-range">
+        <input type="number" placeholder="Min" value="0">
+        <input type="number" placeholder="Max" value="10">
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Thể loại</div>
+      <label class="sidebar-option"><input type="checkbox" checked> Pop / V-Pop</label>
+      <label class="sidebar-option"><input type="checkbox" checked> Ballad</label>
+      <label class="sidebar-option"><input type="checkbox"> EDM / Electronic</label>
+      <label class="sidebar-option"><input type="checkbox"> Indie / Alternative</label>
+      <label class="sidebar-option"><input type="checkbox"> Hip Hop / Rap</label>
+      <label class="sidebar-option"><input type="checkbox"> Nhạc trữ tình</label>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Royalty %</div>
+      <label class="sidebar-option"><input type="checkbox"> 5% trở xuống</label>
+      <label class="sidebar-option"><input type="checkbox"> 6–10%</label>
+      <label class="sidebar-option"><input type="checkbox"> 10% trở lên</label>
+    </div>
+  </aside>
+
+  <!-- NFT GRID -->
+  <div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:1rem;">Hiển thị 127 kết quả</div>
+    <div class="nft-grid" id="nftGrid">
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" style="position:relative;" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-header" id="modalHeader"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="buy-section" id="buySection"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-title">✅ Giao dịch thành công!</div>
+  <div id="toastMsg"></div>
+  <div class="toast-hash" id="toastHash"></div>
+</div>
+
+<script>
+const nfts = [
+  { id:1, emoji:'🎵', bg:'linear-gradient(135deg,#1a1040,#2d1060)', title:'Mưa Hồng', artist:'Trịnh Công Sơn', genre:'ballad', price:'0.08', royalty:'8%', tokenId:'#001', owner:'0x4f3c...8a1b', hash:'a7f3c2e1d4b5...', editions:'1/1', verified:true },
+  { id:2, emoji:'🎸', bg:'linear-gradient(135deg,#0a2040,#103060)', title:'Nơi Này Có Anh', artist:'Sơn Tùng M-TP', genre:'pop', price:'0.15', royalty:'10%', tokenId:'#002', owner:'0xb2e4...3d7f', hash:'c9a1b3f5e2d4...', editions:'1/1', verified:true },
+  { id:3, emoji:'🎹', bg:'linear-gradient(135deg,#200a30,#400860)', title:'Chạy Ngay Đi', artist:'Sơn Tùng M-TP', genre:'pop', price:'0.12', royalty:'10%', tokenId:'#003', owner:'0xc1d5...9e2a', hash:'f4b2a8c6e1d3...', editions:'1/1', verified:true },
+  { id:4, emoji:'🎤', bg:'linear-gradient(135deg,#0a2818,#0f4020)', title:'Người Lạ Ơi', artist:'Karik ft. Orange', genre:'pop', price:'0.09', royalty:'7%', tokenId:'#004', owner:'0xd3f1...5c8b', hash:'b6e3d1a9c7f2...', editions:'1/1', verified:true },
+  { id:5, emoji:'🥁', bg:'linear-gradient(135deg,#281000,#502000)', title:'Đường Tôi Chở Em Về', artist:'Hà Anh Tuấn', genre:'ballad', price:'0.07', royalty:'6%', tokenId:'#005', owner:'0xe5a2...7b1c', hash:'d8c4f2b1a6e3...', editions:'1/1', verified:false },
+  { id:6, emoji:'🎺', bg:'linear-gradient(135deg,#001828,#003050)', title:'Từng Là', artist:'Hà Anh Tuấn', genre:'ballad', price:'0.11', royalty:'6%', tokenId:'#006', owner:'0xf1b3...2a9d', hash:'e2a7d5c3b8f1...', editions:'1/1', verified:true },
+  { id:7, emoji:'🎻', bg:'linear-gradient(135deg,#1e0818,#3a1030)', title:'Em Của Ngày Hôm Qua', artist:'Suni Hạ Linh', genre:'indie', price:'0.06', royalty:'5%', tokenId:'#007', owner:'0xa4c2...8f3e', hash:'c1f5e9a2d7b4...', editions:'1/1', verified:true },
+  { id:8, emoji:'🎧', bg:'linear-gradient(135deg,#101018,#202040)', title:'Yêu Một Người Có Lẽ', artist:'Mono', genre:'ballad', price:'0.13', royalty:'9%', tokenId:'#008', owner:'0xb8e1...4d6c', hash:'a4b2f8c6d1e5...', editions:'1/1', verified:true },
+  { id:9, emoji:'🎼', bg:'linear-gradient(135deg,#001008,#002018)', title:'Tháng Năm Còn Lại', artist:'Bùi Anh Tuấn', genre:'ballad', price:'0.05', royalty:'5%', tokenId:'#009', owner:'0xc7d4...1a2f', hash:'f7c1a9e4b2d6...', editions:'1/1', verified:false },
+  { id:10, emoji:'🎙️', bg:'linear-gradient(135deg,#280008,#500010)', title:'Như Những Phút Ban Đầu', artist:'Mỹ Tâm', genre:'ballad', price:'0.18', royalty:'12%', tokenId:'#010', owner:'0xd2a8...6e3b', hash:'b9f3e7a1c5d2...', editions:'1/1', verified:true },
+  { id:11, emoji:'🥁', bg:'linear-gradient(135deg,#1c1800,#383000)', title:'Wildfire', artist:'MONO', genre:'edm', price:'0.10', royalty:'8%', tokenId:'#011', owner:'0xe6b1...9c4a', hash:'d1a5f9c3e7b2...', editions:'1/1', verified:true },
+  { id:12, emoji:'🎸', bg:'linear-gradient(135deg,#001820,#003040)', title:'Nothing', artist:'Bích Phương', genre:'indie', price:'0.08', royalty:'7%', tokenId:'#012', owner:'0xf3c7...2b8d', hash:'e5c9a3d7f1b4...', editions:'1/1', verified:true },
+];
+
+function renderGrid(filter = 'all') {
+  const grid = document.getElementById('nftGrid');
+  const list = filter === 'all' ? nfts : nfts.filter(n => n.genre === filter);
+  grid.innerHTML = list.map(n => `
+    <div class="nft-card" onclick="openModal(${n.id})">
+      <div class="nft-cover" style="background:${n.bg}">
+        ${n.emoji}
+        ${n.verified ? '<div class="verified-badge">✓ VERIFIED</div>' : ''}
+        <div class="play-btn">▶</div>
+      </div>
+      <div class="nft-info">
+        <div class="nft-artist">${n.artist}</div>
+        <div class="nft-title">${n.title}</div>
+        <div class="nft-footer">
+          <div>
+            <div class="nft-price-label">GIÁ HIỆN TẠI</div>
+            <div class="nft-price">${n.price} ETH</div>
+          </div>
+          <div class="nft-editions">${n.editions}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCat(el, cat) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(cat);
+}
+
+function openModal(id) {
+  const n = nfts.find(x => x.id === id);
+  document.getElementById('modalHeader').innerHTML = `
+    <div class="modal-cover" style="background:${n.bg}">${n.emoji}</div>
+    <div class="modal-meta">
+      <div class="modal-artist">${n.artist}</div>
+      <div class="modal-title">${n.title}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="tag tag-blue">Token ${n.tokenId}</span>
+        <span class="tag tag-purple">ERC-721</span>
+        ${n.verified ? '<span class="tag tag-green">VERIFIED ON-CHAIN</span>' : ''}
+        <span class="tag tag-amber">Royalty ${n.royalty}</span>
+      </div>
+    </div>`;
+
+  document.getElementById('modalBody').innerHTML = `
+    <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;font-weight:700;">Thông tin On-Chain</div>
+    <div class="data-row"><span class="data-label">Contract Address</span><span class="data-value hash">0xA0b86991c621...31eB</span></div>
+    <div class="data-row"><span class="data-label">Token ID</span><span class="data-value">${n.tokenId}</span></div>
+    <div class="data-row"><span class="data-label">Chủ sở hữu hiện tại</span><span class="data-value hash">${n.owner}</span></div>
+    <div class="data-row"><span class="data-label">Blockchain</span><span class="data-value">Ethereum (Sepolia Testnet)</span></div>
+    <div class="data-row"><span class="data-label">Chuẩn Token</span><span class="data-value">ERC-721</span></div>
+    <div class="data-row"><span class="data-label">Lưu trữ</span><span class="data-value">IPFS (Phi tập trung)</span></div>
+    <div class="data-row"><span class="data-label">Audio Hash (SHA-256)</span><span class="data-value hash">${n.hash}</span></div>
+    <div class="data-row"><span class="data-label">Tính toàn vẹn</span><span class="data-value verified">✓ verifyAudioIntegrity() = true</span></div>
+    <div class="data-row"><span class="data-label">Royalty cho tác giả</span><span class="data-value" style="color:var(--accent3);">${n.royalty} mỗi giao dịch</span></div>`;
+
+  document.getElementById('buySection').innerHTML = `
+    <div>
+      <div style="font-size:11px;color:var(--text3);">GIÁ</div>
+      <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--accent);">${n.price} ETH</div>
+      <div style="font-size:12px;color:var(--text3);">≈ ${(parseFloat(n.price)*55000000).toLocaleString('vi-VN')} VNĐ</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="makeOffer('${n.title}')">Đặt Offer</button>
+      <button class="btn btn-primary" onclick="buyNow('${n.title}','${n.price}','${n.tokenId}')">Mua Ngay ⚡</button>
+    </div>`;
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function buyNow(title, price, tokenId) {
+  closeModal();
+  const hash = '0x' + Math.random().toString(16).slice(2,12) + Math.random().toString(16).slice(2,12);
+  document.getElementById('toastMsg').textContent = `Đã mua: "${title}" — ${price} ETH`;
+  document.getElementById('toastHash').textContent = `Tx: ${hash}`;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+function makeOffer(title) {
+  closeModal();
+  document.getElementById('toastMsg').textContent = `Offer đã gửi cho: "${title}"`;
+  document.getElementById('toastHash').textContent = 'Đang chờ xác nhận từ chủ sở hữu...';
+  document.querySelector('.toast').style.borderColor = 'var(--accent3)';
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => { t.classList.remove('show'); document.querySelector('.toast').style.borderColor = 'var(--green)'; }, 3500);
+}
+
+function showWallet() { alert('MetaMask\n\nĐịa chỉ: 0x4f3c...8a1b\nBalance: 2.47 ETH\nNetwork: Sepolia Testnet'); }
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+renderGrid();
+</script>
+</body>
+</html>

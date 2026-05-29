@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundChain — NFT Music Marketplace</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 2rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 7vw, 88px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 .line2 { color: var(--accent); }
+.hero h1 .line3 { color: var(--accent2); }
+
+.hero-desc {
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 560px;
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* HERO VISUAL */
+.hero-visual {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 420px;
+  height: 420px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vinyl-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  animation: float 4s ease-in-out infinite;
+}
+
+.vinyl-card:nth-child(2) { animation-delay: -1s; margin-top: 24px; }
+.vinyl-card:nth-child(3) { animation-delay: -2s; margin-top: -12px; }
+.vinyl-card:nth-child(4) { animation-delay: -3s; }
+
+.vinyl-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0.7;
+}
+
+.vinyl-img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vinyl-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--text); }
+.vinyl-artist { font-size: 11px; color: var(--text3); }
+.vinyl-price { font-size: 12px; color: var(--accent); font-weight: 700; }
+
+/* FEATURES */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.feature-card:hover { border-color: var(--border2); }
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 1rem;
+}
+
+.feature-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.feature-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+.feature-card .corner-deco {
+  position: absolute;
+  bottom: -20px; right: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  opacity: 0.06;
+}
+
+/* HOW IT WORKS */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+  margin-top: 2rem;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 28px; left: 12.5%; right: 12.5%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  opacity: 0.3;
+}
+
+.step {
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.step-num {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 0 auto 1.2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.step-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; margin-bottom: 0.5rem; }
+.step-desc { font-size: 12px; color: var(--text2); }
+
+/* FOOTER */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text3);
+  font-size: 12px;
+}
+
+@media (max-width: 1024px) {
+  .hero-visual { display: none; }
+}
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+  .steps::before { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- GLOW ORBS -->
+<div class="orb" style="width:600px;height:600px;background:rgba(99,210,255,0.04);top:-200px;left:-200px;"></div>
+<div class="orb" style="width:400px;height:400px;background:rgba(168,85,247,0.05);bottom:10%;right:-100px;"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Sound<span>Chain</span></a>
+  <ul class="nav-links">
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="artist.html">Artist Studio</a></li>
+    <li><a href="collection.html">My Collection</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="marketplace.html" class="btn btn-outline btn-sm">Explore</a>
+    <a href="artist.html" class="btn btn-primary btn-sm">Connect Wallet</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Blockchain · NFT · Music</div>
+  <h1 class="fade-up">
+    Own Your<br>
+    <span class="line2">Music.</span><br>
+    <span class="line3">Forever.</span>
+  </h1>
+  <p class="hero-desc fade-up-2">
+    Nền tảng giao dịch NFT âm nhạc phi tập trung đầu tiên tại Việt Nam. 
+    Đảm bảo quyền sở hữu bất biến bằng Blockchain — minh bạch, an toàn, tức thì.
+  </p>
+  <div class="hero-cta fade-up-3">
+    <a href="marketplace.html" class="btn btn-primary">Khám phá Marketplace →</a>
+    <a href="artist.html" class="btn btn-outline">Tôi là Nghệ Sĩ</a>
+  </div>
+
+  <!-- FLOATING CARDS -->
+  <div class="hero-visual">
+    <div class="vinyl-card">
+      <div class="vinyl-img" style="background:linear-gradient(135deg,#1a1040,#2d1060);">🎵</div>
+      <div class="vinyl-title">Mưa Hồng</div>
+      <div class="vinyl-artist">Trịnh Công Sơn</div>
+      <div class="vinyl-price">0.08 ETH</div>
+    </div>
+    <div class="vinyl-card">
+      <div class="vinyl-img" style="background:linear-gradient(135deg,#0a2040,#103060);">🎸</div>
+      <div class="vinyl-title">Nơi Này Có Anh</div>
+      <div class="vinyl-artist">Sơn Tùng M-TP</div>
+      <div class="vinyl-price">0.15 ETH</div>
+    </div>
+    <div class="vinyl-card">
+      <div class="vinyl-img" style="background:linear-gradient(135deg,#200a30,#400860);">🎹</div>
+      <div class="vinyl-title">Chạy Ngay Đi</div>
+      <div class="vinyl-artist">Sơn Tùng M-TP</div>
+      <div class="vinyl-price">0.12 ETH</div>
+    </div>
+    <div class="vinyl-card">
+      <div class="vinyl-img" style="background:linear-gradient(135deg,#0a2818,#0f4020);">🎤</div>
+      <div class="vinyl-title">Người Lạ Ơi</div>
+      <div class="vinyl-artist">Karik ft. Orange</div>
+      <div class="vinyl-price">0.09 ETH</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- STATS -->
+<div class="section" style="padding-top:3rem;padding-bottom:3rem;">
+  <div class="stats-row fade-up">
+    <div class="stat-item">
+      <div class="stat-value">2,847</div>
+      <div class="stat-label">NFT Đã Đúc</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">487</div>
+      <div class="stat-label">Nghệ Sĩ</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">12,540</div>
+      <div class="stat-label">Giao Dịch</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">1,284 ETH</div>
+      <div class="stat-label">Tổng Giá Trị</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">100%</div>
+      <div class="stat-label">On-Chain Verified</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="hero-eyebrow">Tại sao chọn SoundChain</div>
+  <h2 class="section-title fade-up">Công nghệ bảo vệ<br>tác quyền của bạn</h2>
+  <p class="section-sub">Blockchain + IPFS + Smart Contract = quyền sở hữu không thể tranh cãi</p>
+
+  <div class="features-grid">
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background:rgba(99,210,255,0.1);">🔐</div>
+      <div class="feature-title">Tính toàn vẹn tuyệt đối</div>
+      <p class="feature-desc">SHA-256 Hashing + Avalanche Effect: thay đổi 1 bit trong file nhạc sẽ bị phát hiện ngay tức thì qua hàm verifyAudioIntegrity.</p>
+      <div class="corner-deco" style="background:var(--accent);"></div>
+    </div>
+    <div class="feature-card fade-up-2">
+      <div class="feature-icon" style="background:rgba(168,85,247,0.1);">⚡</div>
+      <div class="feature-title">Royalties tự động</div>
+      <p class="feature-desc">Smart Contract ERC-721 tự động chuyển phí bản quyền về ví nghệ sĩ mỗi khi có giao dịch thứ cấp — không cần trung gian.</p>
+      <div class="corner-deco" style="background:var(--accent2);"></div>
+    </div>
+    <div class="feature-card fade-up-3">
+      <div class="feature-icon" style="background:rgba(16,185,129,0.1);">🌐</div>
+      <div class="feature-title">Lưu trữ phi tập trung</div>
+      <p class="feature-desc">File nhạc gốc lưu trên IPFS — không có server trung tâm nào có thể xóa hoặc kiểm duyệt tác phẩm của bạn.</p>
+      <div class="corner-deco" style="background:var(--green);"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="padding-top:0;">
+  <div class="hero-eyebrow">Quy trình</div>
+  <h2 class="section-title fade-up">Hoạt động như thế nào?</h2>
+  <p class="section-sub">4 bước đơn giản để sở hữu âm nhạc trên Blockchain</p>
+
+  <div class="steps">
+    <div class="step fade-up">
+      <div class="step-num">01</div>
+      <div class="step-title">Kết nối Ví</div>
+      <p class="step-desc">Dùng MetaMask để xác thực danh tính bằng Private Key</p>
+    </div>
+    <div class="step fade-up-2">
+      <div class="step-num">02</div>
+      <div class="step-title">Upload & Mint</div>
+      <p class="step-desc">Nghệ sĩ upload file nhạc, Smart Contract tạo NFT độc bản</p>
+    </div>
+    <div class="step fade-up-3">
+      <div class="step-num">03</div>
+      <div class="step-title">Mua Bán</div>
+      <p class="step-desc">Atomic Swap đảm bảo tiền và NFT chuyển đổi đồng thời, an toàn</p>
+    </div>
+    <div class="step fade-up-4">
+      <div class="step-num">04</div>
+      <div class="step-title">Sở Hữu</div>
+      <p class="step-desc">Quyền sở hữu ghi vĩnh viễn trên Ledger, có thể xác minh bất cứ lúc nào</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="section" style="padding-top:0;">
+  <div style="background:linear-gradient(135deg,rgba(99,210,255,0.08),rgba(168,85,247,0.08));border:1px solid var(--border2);border-radius:16px;padding:3rem;text-align:center;">
+    <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;margin-bottom:1rem;">Bắt đầu ngay hôm nay</h2>
+    <p style="color:var(--text2);margin-bottom:2rem;">Đúc NFT nhạc đầu tiên của bạn miễn phí trong 30 giây</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <a href="artist.html" class="btn btn-primary">Tôi là Nghệ Sĩ →</a>
+      <a href="marketplace.html" class="btn btn-outline">Khám phá ngay</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom:8px;font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text2);">Sound<span style="color:var(--accent);">Chain</span></div>
+  Ứng dụng Blockchain xây dựng hệ thống giao dịch NFT đảm bảo quyền sở hữu nhạc số · PTIT 2025
+</footer>
+
+</body>
+</html>
