@@ -8,8 +8,7 @@
 <style>
 /* ===== LAYOUT ===== */
 .studio-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: block;
   min-height: 100vh;
   padding-top: 60px;
 }
@@ -112,9 +111,9 @@
 /* ===== MAIN CONTENT ===== */
 .studio-main {
   margin-left: 240px;
+  width: calc(100% - 240px);
   min-height: 100vh;
 }
-
 /* ===== HERO BANNER ===== */
 .studio-hero {
   position: relative;
@@ -533,9 +532,11 @@
 .search-result-card.show { display: block; }
 
 @media (max-width: 900px) {
-  .studio-layout { grid-template-columns: 1fr; }
   .studio-sidebar { display: none; }
-  .studio-main { margin-left: 0; }
+  .studio-main {
+    margin-left: 0;
+    width: 100%;
+  }
   .form-grid { grid-template-columns: 1fr; }
   .royalty-display { grid-template-columns: 1fr; }
   .approval-grid { grid-template-columns: 1fr; }
