@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Studio — SoundChain</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ===== LAYOUT ===== */
+.studio-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  padding-top: 60px;
+}
+
+/* ===== SIDEBAR ===== */
+.studio-sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 240px;
+  height: calc(100vh - 60px);
+  background: rgba(13,18,32,0.95);
+  border-right: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+.sidebar-brand-sub { font-size: 11px; color: var(--text3); margin-top: 2px; letter-spacing: 0.5px; }
+
+.sidebar-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  margin: 0;
+}
+.sb-stat {
+  background: var(--bg2);
+  padding: 10px 12px;
+  text-align: center;
+}
+.sb-stat-val { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--accent); }
+.sb-stat-lbl { font-size: 10px; color: var(--text3); letter-spacing: 0.5px; }
+
+.sidebar-nav { padding: 1rem 0; flex: 1; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  text-transform: uppercase;
+  padding: 0.5rem 1.25rem 0.25rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 1.25rem;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+  position: relative;
+}
+.nav-item:hover { color: var(--text); background: rgba(99,210,255,0.04); }
+.nav-item.active {
+  color: var(--accent);
+  background: rgba(99,210,255,0.08);
+  border-left-color: var(--accent);
+}
+.nav-item .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--accent2);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.sidebar-security {
+  margin: 0 1rem 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+.sec-title { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+.sec-model { font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--accent2); margin-bottom: 8px; }
+.sec-item { font-size: 11px; color: var(--text2); padding: 2px 0; }
+.sec-item::before { content: '▸ '; color: var(--accent); }
+
+/* ===== MAIN CONTENT ===== */
+.studio-main {
+  margin-left: 240px;
+  min-height: 100vh;
+}
+
+/* ===== HERO BANNER ===== */
+.studio-hero {
+  position: relative;
+  padding: 3rem 2.5rem 2rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-bg-mesh {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 50%, rgba(168,85,247,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 80% at 20% 30%, rgba(99,210,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-ticker {
+  display: flex;
+  gap: 10px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+.ticker-inner {
+  display: flex;
+  gap: 10px;
+  animation: ticker 30s linear infinite;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  background: rgba(255,255,255,0.03);
+  flex-shrink: 0;
+}
+.ticker-pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.hero-content { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+
+.hero-title { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1.1; margin-bottom: 0.5rem; }
+.hero-subtitle { font-size: 13px; color: var(--text2); max-width: 500px; }
+
+/* NFT PREVIEW CARD */
+.nft-preview-card {
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 16px;
+  min-width: 220px;
+  position: relative;
+  overflow: hidden;
+}
+.nft-preview-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+}
+.npc-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1a1040, #2d1060, #400880);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.npc-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4));
+}
+.npc-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.npc-sub { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+.npc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ===== SECTION CONTENT ===== */
+.studio-section {
+  display: none;
+  padding: 2rem 2.5rem;
+  animation: fadeUp 0.35s ease both;
+}
+.studio-section.active { display: block; }
+
+.section-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.badge-mint { background: rgba(99,210,255,0.1); color: var(--accent); border: 1px solid rgba(99,210,255,0.2); }
+.badge-verify { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+.badge-fingerprint { background: rgba(168,85,247,0.1); color: var(--accent2); border: 1px solid rgba(168,85,247,0.2); }
+.badge-royalty { background: rgba(245,158,11,0.1); color: var(--accent3); border: 1px solid rgba(245,158,11,0.2); }
+.badge-transfer { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.badge-approval { background: rgba(99,210,255,0.1); color: var(--accent); border: 1px solid rgba(99,210,255,0.2); }
+.badge-metadata { background: rgba(168,85,247,0.1); color: var(--accent2); border: 1px solid rgba(168,85,247,0.2); }
+
+.section-title-main { font-family: var(--font-display); font-size: 28px; font-weight: 800; margin-bottom: 0.4rem; }
+.section-desc { font-size: 13px; color: var(--text2); margin-bottom: 2rem; line-height: 1.6; }
+
+/* FORM CARD */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+  text-transform: uppercase;
+}
+
+.input-wrap { position: relative; }
+.input-wrap input,
+.input-wrap textarea,
+.input-wrap select {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 11px 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+.input-wrap input:focus,
+.input-wrap textarea:focus,
+.input-wrap select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,210,255,0.08);
+}
+
+/* FILE UPLOAD */
+.file-upload {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg2);
+  position: relative;
+}
+.file-upload:hover, .file-upload.dragover {
+  border-color: var(--accent);
+  background: rgba(99,210,255,0.04);
+}
+.file-upload input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+}
+.file-upload-icon { font-size: 28px; margin-bottom: 8px; }
+.file-upload-text { font-size: 13px; color: var(--text2); }
+.file-upload-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.file-upload.has-file { border-color: var(--green); background: rgba(16,185,129,0.04); }
+.file-upload.has-file .file-upload-text { color: var(--green); }
+
+/* PROGRESS BAR */
+.progress-bar-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+.progress-bar-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; display: flex; justify-content: space-between; }
+.progress-bar-track { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* RESULT BOX */
+.result-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  font-size: 12px;
+  color: var(--text2);
+  min-height: 48px;
+  line-height: 1.7;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.result-box.success { border-color: var(--green); background: rgba(16,185,129,0.05); color: var(--green); }
+.result-box.error { border-color: var(--red); background: rgba(239,68,68,0.05); color: var(--red); }
+.result-box.loading { border-color: var(--accent); }
+
+.result-scan {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: scan 1.5s linear infinite;
+  opacity: 0;
+}
+.result-box.loading .result-scan { opacity: 1; }
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* HASH DISPLAY */
+.hash-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  word-break: break-all;
+  line-height: 1.8;
+  margin-top: 8px;
+}
+
+/* DATA TABLE */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: top;
+}
+.data-table td:first-child { color: var(--text3); width: 40%; }
+.data-table td:last-child { color: var(--text); word-break: break-all; font-family: var(--font-mono); font-size: 12px; }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* ROYALTY DISPLAY */
+.royalty-display {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-top: 1rem;
+}
+.royalty-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+.royalty-card.highlight { border-color: var(--accent3); background: rgba(245,158,11,0.05); }
+.royalty-value { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--accent); }
+.royalty-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* COMPARE RESULT */
+.compare-result {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  margin-top: 1rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+}
+.compare-result.show { opacity: 1; transform: translateY(0); }
+.compare-icon { font-size: 28px; flex-shrink: 0; }
+.compare-text-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+.compare-text-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* TRANSFER FLOW */
+.transfer-flow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+.transfer-addr {
+  flex: 1;
+  min-width: 120px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+.transfer-addr-label { color: var(--text3); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.transfer-addr-val { color: var(--accent); font-family: var(--font-mono); word-break: break-all; }
+.transfer-arrow { font-size: 20px; color: var(--accent2); flex-shrink: 0; }
+
+/* APPROVAL GRID */
+.approval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1rem; }
+.approval-btn-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+.approval-btn-card h4 { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.approval-btn-card p { font-size: 12px; color: var(--text3); margin-bottom: 1rem; line-height: 1.5; }
+
+/* STEP INDICATOR */
+.mint-steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+}
+.mint-step {
+  flex: 1;
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text3);
+  border-bottom: 2px solid var(--border);
+  transition: all 0.3s;
+  position: relative;
+}
+.mint-step.active { color: var(--accent); border-bottom-color: var(--accent); }
+.mint-step.done { color: var(--green); border-bottom-color: var(--green); }
+.mint-step-num { font-family: var(--font-display); font-size: 16px; font-weight: 800; display: block; margin-bottom: 2px; }
+
+/* GLOWING SUBMIT BTN */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3), var(--accent));
+  background-size: 300% 100%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: shimmer 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.btn-glow:hover::after { opacity: 1; }
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* SEARCH NFT */
+.search-result-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  display: none;
+  animation: fadeUp 0.3s ease;
+}
+.search-result-card.show { display: block; }
+
+@media (max-width: 900px) {
+  .studio-layout { grid-template-columns: 1fr; }
+  .studio-sidebar { display: none; }
+  .studio-main { margin-left: 0; }
+  .form-grid { grid-template-columns: 1fr; }
+  .royalty-display { grid-template-columns: 1fr; }
+  .approval-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb" style="width:500px;height:500px;background:rgba(168,85,247,0.05);top:20%;right:-200px;"></div>
+<div class="orb" style="width:400px;height:400px;background:rgba(99,210,255,0.04);bottom:10%;left:-100px;"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Sound<span>Chain</span></a>
+  <ul class="nav-links">
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="artist.html" class="active">Artist Studio</a></li>
+    <li><a href="collection.html">My Collection</a></li>
+  </ul>
+  <div class="nav-right">
+    <span style="font-size:11px;color:var(--text3);">Sepolia Testnet</span>
+    <a href="#" class="btn btn-primary btn-sm" id="walletBtn" onclick="connectWallet()">Connect Wallet</a>
+  </div>
+</nav>
+
+<div class="studio-layout">
+  <!-- SIDEBAR -->
+  <aside class="studio-sidebar">
+    <div class="sidebar-brand">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">🎵</div>
+        <div>
+          <div class="sidebar-brand-name">SoundChain</div>
+          <div class="sidebar-brand-sub">Music NFT Registry</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-stats">
+      <div class="sb-stat"><div class="sb-stat-val" id="sb-nfts">0</div><div class="sb-stat-lbl">NFTs Minted</div></div>
+      <div class="sb-stat"><div class="sb-stat-val" id="sb-verify">0</div><div class="sb-stat-lbl">Verified</div></div>
+      <div class="sb-stat"><div class="sb-stat-val" id="sb-transfer">0</div><div class="sb-stat-lbl">Transfers</div></div>
+      <div class="sb-stat"><div class="sb-stat-val" id="sb-royalty">0</div><div class="sb-stat-lbl">Royalty Checks</div></div>
+    </div>
+
+    <!-- TICKER in sidebar -->
+    <div style="padding: 8px 0; border-bottom: 1px solid var(--border); overflow: hidden;">
+      <div class="ticker-inner" style="padding: 0 8px; gap: 8px;">
+        <span class="ticker-pill"><span class="dot" style="background:var(--accent);"></span>Integrity: SHA-256</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--accent2);"></span>Royalty: ERC2981</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--green);"></span>Ownership: ERC721</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--accent3);"></span>CIA Model</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--accent);"></span>On-chain query</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--accent2);"></span>Integrity: SHA-256</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--green);"></span>Royalty: ERC2981</span>
+        <span class="ticker-pill"><span class="dot" style="background:var(--accent3);"></span>Ownership: ERC721</span>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Tác Giả</div>
+      <div class="nav-item active" onclick="switchTab('mint', this)"><span class="nav-icon">🎵</span> Mint NFT</div>
+      <div class="nav-item" onclick="switchTab('search', this)"><span class="nav-icon">🔍</span> Search NFT</div>
+
+      <div class="nav-section-label" style="margin-top:8px;">Xác Minh</div>
+      <div class="nav-item" onclick="switchTab('verify', this)"><span class="nav-icon">🛡️</span> Verify Audio</div>
+      <div class="nav-item" onclick="switchTab('fingerprint', this)"><span class="nav-icon">👆</span> Audio Fingerprint</div>
+
+      <div class="nav-section-label" style="margin-top:8px;">Kinh Doanh</div>
+      <div class="nav-item" onclick="switchTab('royalty', this)"><span class="nav-icon">💰</span> Royalty Info</div>
+      <div class="nav-item" onclick="switchTab('transfer', this)"><span class="nav-icon">🔄</span> Transfer Ownership</div>
+
+      <div class="nav-section-label" style="margin-top:8px;">Quản Lý</div>
+      <div class="nav-item" onclick="switchTab('approval', this)"><span class="nav-icon">✅</span> Approval Manager <span class="nav-badge">NEW</span></div>
+      <div class="nav-item" onclick="switchTab('metadata', this)"><span class="nav-icon">📝</span> Update Metadata</div>
+    </div>
+
+    <div class="sidebar-security">
+      <div class="sec-title">Security Model</div>
+      <div class="sec-model">CIA + Blockchain</div>
+      <div class="sec-item">C: Hash only</div>
+      <div class="sec-item">I: SHA256 + Fingerprint</div>
+      <div class="sec-item">A: Blockchain storage</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="studio-main">
+    <!-- HERO BANNER -->
+    <div class="studio-hero">
+      <div class="hero-bg-mesh"></div>
+      <div class="hero-ticker">
+        <div class="ticker-inner">
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent);"></span>Copyright Check: Audio Reuse Detection</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--text3);"></span>Confidentiality: Hash only</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent2);"></span>Integrity: SHA-256 + Fingerprint</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--green);"></span>Availability: On-chain query</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent3);"></span>Royalty: ERC2981</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent);"></span>Ownership: ERC721 Transfer</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent);"></span>Copyright Check: Audio Reuse Detection</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--text3);"></span>Confidentiality: Hash only</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent2);"></span>Integrity: SHA-256 + Fingerprint</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--green);"></span>Availability: On-chain query</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent3);"></span>Royalty: ERC2981</span>
+          <span class="ticker-pill"><span class="dot" style="background:var(--accent);"></span>Ownership: ERC721 Transfer</span>
+        </div>
+      </div>
+      <div class="hero-content">
+        <div>
+          <div class="tag tag-purple" style="margin-bottom:10px;">Blockchain Music Registry</div>
+          <h1 class="hero-title">Protect Music Copyright<br>with Blockchain<span style="color:var(--accent);animation:blink 1s infinite;">|</span></h1>
+          <p class="hero-subtitle">Register music ownership, generate audio hashes, compare fingerprints, verify authenticity, manage royalties and transfer copyright ownership with NFT technology.</p>
+          <div style="display:flex;gap:10px;margin-top:1.2rem;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="switchTab('mint', document.querySelector('[onclick*=mint]'))">Mint NFT</button>
+            <button class="btn btn-outline btn-sm" onclick="switchTab('verify', document.querySelectorAll('.nav-item')[2])">Verify Audio</button>
+          </div>
+        </div>
+        <div class="nft-preview-card">
+          <div class="npc-cover">🎵</div>
+          <div class="npc-title">Music Copyright NFT</div>
+          <div class="npc-sub">ERC721 · ERC2981 · SHA-256</div>
+          <div class="npc-tags">
+            <span class="tag tag-blue" style="font-size:10px;">Network: Ganache</span>
+            <span class="tag tag-purple" style="font-size:10px;">Security: CIA Model</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== MINT NFT =================== -->
+    <div class="studio-section active" id="tab-mint">
+      <div class="section-badge badge-mint">Create NFT</div>
+      <h2 class="section-title-main">Mint Music Copyright NFT</h2>
+      <p class="section-desc">Upload file audio để tạo audioHash, upload hợp đồng PDF để tạo rightsHash, sau đó mint NFT bản quyền âm nhạc.</p>
+
+      <div class="mint-steps">
+        <div class="mint-step active" id="step1"><span class="mint-step-num">01</span>Thông tin</div>
+        <div class="mint-step" id="step2"><span class="mint-step-num">02</span>Upload files</div>
+        <div class="mint-step" id="step3"><span class="mint-step-num">03</span>Hash & Verify</div>
+        <div class="mint-step" id="step4"><span class="mint-step-num">04</span>Mint on-chain</div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Tên bài hát</label>
+            <div class="input-wrap">
+              <input type="text" id="songName" placeholder="Vd: Bài hát đầu tiên" oninput="updatePreview()">
+            </div>
+            <span style="font-size:11px;color:var(--text3);">Tên tác phẩm âm nhạc sẽ được lưu trong smart contract.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nghệ sĩ / Tác giả</label>
+            <div class="input-wrap">
+              <input type="text" id="artistName" placeholder="Vd: Jack-J97" oninput="updatePreview()">
+            </div>
+            <span style="font-size:11px;color:var(--text3);">Tên nghệ sĩ hoặc người sáng tạo tác phẩm.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Royalty % (ERC-2981)</label>
+            <div class="input-wrap">
+              <input type="number" id="royaltyPct" placeholder="Vd: 10" min="0" max="50" value="10">
+            </div>
+            <span style="font-size:11px;color:var(--text3);">Phần trăm royalty mỗi lần NFT được bán lại (0–50%).</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Giá ban đầu (ETH)</label>
+            <div class="input-wrap">
+              <input type="number" id="initPrice" placeholder="Vd: 0.1" step="0.01" value="0.1">
+            </div>
+            <span style="font-size:11px;color:var(--text3);">Giá niêm yết khi NFT xuất hiện trên marketplace.</span>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Audio File</label>
+            <div class="file-upload" id="audioUpload" onclick="document.getElementById('audioFile').click()">
+              <input type="file" id="audioFile" accept=".mp3,.wav,.flac,.ogg" onchange="handleAudioFile(this)">
+              <div class="file-upload-icon">🎵</div>
+              <div class="file-upload-text">Kéo thả hoặc click để chọn file nhạc</div>
+              <div class="file-upload-hint">Hỗ trợ: MP3, WAV, FLAC, OGG · Tối đa 50MB</div>
+            </div>
+            <span style="font-size:11px;color:var(--text3);margin-top:4px;">Hệ thống sẽ tạo SHA-256 audioHash và segment fingerprint từ file audio.</span>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Copyright Document (PDF)</label>
+            <div class="file-upload" id="docUpload" onclick="document.getElementById('docFile').click()">
+              <input type="file" id="docFile" accept=".pdf,.doc,.docx" onchange="handleDocFile(this)">
+              <div class="file-upload-icon">📄</div>
+              <div class="file-upload-text">Upload hợp đồng bản quyền</div>
+              <div class="file-upload-hint">Hỗ trợ: PDF, DOC · Tối đa 10MB</div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Metadata URI (IPFS)</label>
+            <div class="input-wrap">
+              <input type="text" id="metadataUri" placeholder="ipfs://QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco" readonly style="opacity:0.5;cursor:not-allowed;">
+            </div>
+            <span style="font-size:11px;color:var(--text3);">Tự động sinh sau khi upload file thành công.</span>
+          </div>
+        </div>
+
+        <div id="audioHashBox" style="display:none;">
+          <div style="margin-top:1rem;">
+            <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Audio Hash (SHA-256)</div>
+            <div class="hash-display" id="audioHashVal"></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Segment Fingerprint</div>
+            <div class="hash-display" id="fingerprintVal" style="color:var(--accent2);"></div>
+          </div>
+        </div>
+
+        <div class="progress-bar-wrap" id="mintProgress" style="display:none;">
+          <div class="progress-bar-label">
+            <span id="progressLabel">Đang xử lý...</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-glow" onclick="mintNFT()" id="mintBtn">
+          ⚡ Mint NFT on Blockchain
+        </button>
+        <button class="btn btn-outline" onclick="resetMint()">Reset</button>
+        <span id="mintStatus" style="font-size:12px;color:var(--text3);"></span>
+      </div>
+
+      <div class="result-box" id="mintResult" style="margin-top:1rem;">
+        <div class="result-scan"></div>
+        Chưa có giao dịch. Điền thông tin và bấm Mint.
+      </div>
+    </div>
+
+    <!-- =================== SEARCH NFT =================== -->
+    <div class="studio-section" id="tab-search">
+      <div class="section-badge badge-verify">Verify NFT</div>
+      <h2 class="section-title-main">Search Music NFT</h2>
+      <p class="section-desc">Tra cứu thông tin bản quyền, chủ sở hữu và metadata theo Token ID.</p>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label class="form-label">Token ID</label>
+          <div style="display:flex;gap:10px;">
+            <div class="input-wrap" style="flex:1;"><input type="number" id="searchTokenId" placeholder="Vd: 1" min="1"></div>
+            <button class="btn btn-primary" onclick="searchNFT()">🔍 Search</button>
+          </div>
+          <span style="font-size:11px;color:var(--text3);">Nhập Token ID để bắt đầu tra cứu.</span>
+        </div>
+      </div>
+
+      <div class="search-result-card" id="searchResult">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#1a1040,#2d1060);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;">🎵</div>
+          <div>
+            <div id="sr-title" style="font-family:var(--font-display);font-size:20px;font-weight:800;"></div>
+            <div id="sr-artist" style="font-size:13px;color:var(--text3);margin:4px 0;"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="sr-tags"></div>
+          </div>
+        </div>
+        <table class="data-table" id="sr-table"></table>
+      </div>
+    </div>
+
+    <!-- =================== VERIFY AUDIO =================== -->
+    <div class="studio-section" id="tab-verify">
+      <div class="section-badge badge-verify">Integrity Check</div>
+      <h2 class="section-title-main">Verify Audio Authenticity</h2>
+      <p class="section-desc">Upload file audio để tạo SHA-256 hash, sau đó so sánh với audioHash đã lưu trên blockchain.</p>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Token ID</label>
+            <div class="input-wrap"><input type="number" id="verifyTokenId" placeholder="Vd: 1" min="1"></div>
+            <span style="font-size:11px;color:var(--text3);">ID của NFT cần xác minh.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Audio File cần kiểm tra</label>
+            <div class="file-upload" id="verifyUpload" onclick="document.getElementById('verifyFile').click()">
+              <input type="file" id="verifyFile" accept=".mp3,.wav,.flac" onchange="handleVerifyFile(this)">
+              <div class="file-upload-icon">📁</div>
+              <div class="file-upload-text">Chọn file audio</div>
+              <div class="file-upload-hint">Hệ thống chỉ hash file trên trình duyệt, không upload lên blockchain.</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-primary btn-glow" onclick="verifyAudio()">🛡️ Verify Audio</button>
+        </div>
+      </div>
+
+      <div class="result-box" id="verifyResult" style="margin-top:1rem;">
+        <div class="result-scan"></div>
+        Chưa có kết quả xác minh.
+      </div>
+
+      <div id="verifyDetail" style="display:none;margin-top:1rem;" class="form-card">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;">Chi tiết xác minh</div>
+        <table class="data-table">
+          <tr><td>Hash file upload</td><td id="vd-hash1" style="color:var(--accent);"></td></tr>
+          <tr><td>Hash on-chain (Token)</td><td id="vd-hash2" style="color:var(--accent2);"></td></tr>
+          <tr><td>Kết quả</td><td id="vd-result" style="color:var(--green);font-weight:700;"></td></tr>
+          <tr><td>Thời gian</td><td id="vd-time"></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- =================== FINGERPRINT =================== -->
+    <div class="studio-section" id="tab-fingerprint">
+      <div class="section-badge badge-fingerprint">Audio Fingerprinting</div>
+      <h2 class="section-title-main">Detect Partial Audio Reuse</h2>
+      <p class="section-desc">So khớp fingerprint theo từng đoạn để phát hiện file bị cắt, nối, hoặc dùng lại một phần audio.</p>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">File audio gốc</label>
+            <div class="file-upload" id="fp1Upload" onclick="document.getElementById('fp1File').click()">
+              <input type="file" id="fp1File" accept=".mp3,.wav,.flac" onchange="handleFP(this,'fp1')">
+              <div class="file-upload-icon">🎵</div>
+              <div class="file-upload-text">Chọn file đã đăng ký</div>
+              <div class="file-upload-hint">File gốc đã đăng ký bản quyền</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">File audio cần kiểm tra</label>
+            <div class="file-upload" id="fp2Upload" onclick="document.getElementById('fp2File').click()">
+              <input type="file" id="fp2File" accept=".mp3,.wav,.flac" onchange="handleFP(this,'fp2')">
+              <div class="file-upload-icon">🔍</div>
+              <div class="file-upload-text">Chọn file nghi vấn</div>
+              <div class="file-upload-hint">File nghi vấn sao chép</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-purple btn-glow" onclick="compareFingerprint()">🔬 Compare Fingerprint</button>
+        </div>
+      </div>
+
+      <div class="compare-result" id="fpResult">
+        <div class="compare-icon" id="fpIcon">⚡</div>
+        <div>
+          <div class="compare-text-title" id="fpTitle">Chưa có kết quả</div>
+          <div class="compare-text-sub" id="fpSub">Upload 2 file và bấm Compare Fingerprint</div>
+        </div>
+      </div>
+
+      <div id="fpDetail" style="display:none;margin-top:1rem;" class="form-card">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;">Chi tiết fingerprint</div>
+        <div id="fpSegments" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- =================== ROYALTY =================== -->
+    <div class="studio-section" id="tab-royalty">
+      <div class="section-badge badge-royalty">Royalty</div>
+      <h2 class="section-title-main">Royalty Info</h2>
+      <p class="section-desc">Kiểm tra tiền bản quyền mà creator nhận được khi NFT được bán lại theo chuẩn ERC-2981.</p>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Token ID</label>
+            <div class="input-wrap"><input type="number" id="royaltyTokenId" placeholder="Vd: 1" min="1" value="1"></div>
+            <span style="font-size:11px;color:var(--text3);">ID của NFT cần kiểm tra royalty.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sale Price (ETH)</label>
+            <div class="input-wrap"><input type="number" id="salePrice" placeholder="Vd: 1.5" step="0.01" value="1"></div>
+            <span style="font-size:11px;color:var(--text3);">Giá bán giả định tính bằng ETH.</span>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-primary" style="background:var(--accent3);color:var(--bg);" onclick="checkRoyalty()">💰 Check Royalty</button>
+        </div>
+      </div>
+
+      <div id="royaltyDisplay" style="display:none;" class="form-card">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;">Kết quả ERC-2981 royaltyInfo()</div>
+        <div class="royalty-display">
+          <div class="royalty-card">
+            <div class="royalty-value" id="ry-pct">--%</div>
+            <div class="royalty-label">Royalty %</div>
+          </div>
+          <div class="royalty-card highlight">
+            <div class="royalty-value" id="ry-amount" style="color:var(--accent3);">-- ETH</div>
+            <div class="royalty-label">Royalty nhận được</div>
+          </div>
+          <div class="royalty-card">
+            <div class="royalty-value" id="ry-receiver" style="font-size:13px;color:var(--accent2);">0x...</div>
+            <div class="royalty-label">Ví nhận royalty</div>
+          </div>
+        </div>
+        <table class="data-table" style="margin-top:1.5rem;">
+          <tr><td>Contract</td><td style="color:var(--accent);">0xA0b86991c621...31eB</td></tr>
+          <tr><td>Token ID</td><td id="ry-tokenId"></td></tr>
+          <tr><td>Sale Price</td><td id="ry-salePrice"></td></tr>
+          <tr><td>Receiver Address</td><td id="ry-addr" style="color:var(--accent2);"></td></tr>
+          <tr><td>Standard</td><td style="color:var(--green);">ERC-2981 ✓</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- =================== TRANSFER =================== -->
+    <div class="studio-section" id="tab-transfer">
+      <div class="section-badge badge-transfer">Ownership</div>
+      <h2 class="section-title-main">Transfer NFT Ownership</h2>
+      <p class="section-desc">Mô phỏng chuyển nhượng quyền sở hữu bản quyền âm nhạc từ nghệ sĩ sang cá nhân hoặc công ty khai thác.</p>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Token ID</label>
+            <div class="input-wrap"><input type="number" id="transferTokenId" placeholder="Vd: 1" min="1"></div>
+            <span style="font-size:11px;color:var(--text3);">NFT bản quyền cần chuyển nhượng.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Current Owner</label>
+            <div style="display:flex;gap:8px;">
+              <div class="input-wrap" style="flex:1;"><input type="text" id="currentOwner" placeholder="Tự động khi bấm Load Owner" readonly style="opacity:0.6;"></div>
+              <button class="btn btn-outline btn-sm" onclick="loadOwner()">Load</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">From Address</label>
+            <div class="input-wrap"><input type="text" id="fromAddr" placeholder="Địa chỉ owner hiện tại"></div>
+            <span style="font-size:11px;color:var(--text3);">Địa chỉ chuyển NFT đi.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">To Address</label>
+            <div class="input-wrap"><input type="text" id="toAddr" placeholder="Địa chỉ nhận NFT"></div>
+            <span style="font-size:11px;color:var(--text3);">Địa chỉ người/công ty nhận quyền sở hữu.</span>
+          </div>
+        </div>
+        <div id="transferFlowBox" style="display:none;" class="transfer-flow">
+          <div class="transfer-addr"><div class="transfer-addr-label">Từ</div><div class="transfer-addr-val" id="tf-from">0x...</div></div>
+          <div class="transfer-arrow">→</div>
+          <div style="text-align:center;flex-shrink:0;">
+            <div style="font-size:24px;">🎵</div>
+            <div style="font-size:10px;color:var(--accent);margin-top:2px;" id="tf-token">Token #?</div>
+          </div>
+          <div class="transfer-arrow">→</div>
+          <div class="transfer-addr"><div class="transfer-addr-label">Đến</div><div class="transfer-addr-val" id="tf-to">0x...</div></div>
+        </div>
+        <div style="margin-top:1.5rem;display:flex;gap:10px;">
+          <button class="btn btn-primary" style="background:var(--red);" onclick="transferNFT()">🔄 Transfer NFT</button>
+          <button class="btn btn-outline" onclick="previewTransfer()">Preview</button>
+        </div>
+      </div>
+
+      <div class="result-box" id="transferResult" style="margin-top:1rem;">
+        <div class="result-scan"></div>
+        Chưa có giao dịch transfer.
+      </div>
+    </div>
+
+    <!-- =================== APPROVAL =================== -->
+    <div class="studio-section" id="tab-approval">
+      <div class="section-badge badge-approval">Access Control</div>
+      <h2 class="section-title-main">Approval Manager</h2>
+      <p class="section-desc">Quản lý quyền cho marketplace, nhà phân phối hoặc bên thứ ba được phép chuyển nhượng NFT thay owner.</p>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Token ID</label>
+            <div class="input-wrap"><input type="number" id="approvalTokenId" placeholder="Vd: 1"></div>
+            <span style="font-size:11px;color:var(--text3);">NFT cần cấp quyền approve.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Approved Address</label>
+            <div class="input-wrap"><input type="text" id="approvedAddr" placeholder="Địa chỉ được phép chuyển NFT này"></div>
+            <span style="font-size:11px;color:var(--text3);">Cấp quyền cho một địa chỉ cụ thể trên một token.</span>
+          </div>
+        </div>
+        <div class="approval-grid">
+          <div class="approval-btn-card">
+            <h4>Approve Address</h4>
+            <p>Cấp quyền cho một địa chỉ cụ thể được phép chuyển Token ID này.</p>
+            <button class="btn btn-outline btn-sm" onclick="approveAddr()">Approve Address</button>
+          </div>
+          <div class="approval-btn-card">
+            <h4>Get Approved</h4>
+            <p>Kiểm tra địa chỉ nào đang được approve để chuyển Token ID này.</p>
+            <button class="btn btn-outline btn-sm" onclick="getApproved()">Get Approved</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-top:12px;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Owner Address</label>
+            <div class="input-wrap"><input type="text" id="ownerAddr" placeholder="Địa chỉ chủ sở hữu NFT"></div>
+            <span style="font-size:11px;color:var(--text3);">Địa chỉ chủ sở hữu NFT.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Operator Address</label>
+            <div class="input-wrap"><input type="text" id="operatorAddr" placeholder="Marketplace hoặc distributor"></div>
+            <span style="font-size:11px;color:var(--text3);">Địa chỉ được cấp quyền quản lý toàn bộ NFT.</span>
+          </div>
+        </div>
+        <div class="approval-grid" style="margin-top:1rem;">
+          <div class="approval-btn-card">
+            <h4>Set Approval For All</h4>
+            <p>Cấp quyền cho operator quản lý toàn bộ NFT của owner.</p>
+            <button class="btn btn-purple btn-sm" onclick="setApprovalAll()">Set Approval For All</button>
+          </div>
+          <div class="approval-btn-card">
+            <h4>Check Operator</h4>
+            <p>Kiểm tra operator có được approve toàn bộ NFT của owner không.</p>
+            <button class="btn btn-outline btn-sm" onclick="checkOperator()">Check Operator</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-box" id="approvalResult" style="margin-top:1rem;">
+        <div class="result-scan"></div>
+        Chưa có thao tác approval.
+      </div>
+    </div>
+
+    <!-- =================== METADATA =================== -->
+    <div class="studio-section" id="tab-metadata">
+      <div class="section-badge badge-metadata">Manage NFT</div>
+      <h2 class="section-title-main">Update Metadata URI</h2>
+      <p class="section-desc">Cập nhật metadata URI cho NFT. Chỉ chủ sở hữu token mới thực hiện được.</p>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Token ID</label>
+            <div class="input-wrap"><input type="number" id="metaTokenId" placeholder="Vd: 1"></div>
+            <span style="font-size:11px;color:var(--text3);">ID của NFT cần cập nhật.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Metadata URI</label>
+            <div class="input-wrap"><input type="text" id="newMetaUri" placeholder="Vd: ipfs://new-metadata-cid"></div>
+            <span style="font-size:11px;color:var(--text3);">URI metadata mới của NFT.</span>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;display:flex;gap:10px;">
+          <button class="btn btn-purple btn-glow" onclick="updateMetadata()">📝 Update Metadata</button>
+        </div>
+      </div>
+
+      <div class="result-box" id="metadataResult" style="margin-top:1rem;">
+        <div class="result-scan"></div>
+        Chưa có cập nhật nào.
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ===== STATE =====
+let stats = { nfts: 0, verify: 0, transfer: 0, royalty: 0 };
+let walletConnected = false;
+let audioFileData = null, docFileData = null;
+let verifyFileData = null;
+let fp1Data = null, fp2Data = null;
+
+const FAKE_NFTS = {
+  1: { title:'Mưa Hồng', artist:'Trịnh Công Sơn', royalty:'8%', price:'0.08 ETH', owner:'0x4f3c...8a1b', hash:'a7f3c2e1d4b5f8c9e2a1b3d5', fingerprint:'seg01:a7f3|seg02:c2e1|seg03:d4b5|seg04:f8c9', ipfs:'ipfs://QmMuaHong...' },
+  2: { title:'Nơi Này Có Anh', artist:'Sơn Tùng M-TP', royalty:'10%', price:'0.15 ETH', owner:'0xb2e4...3d7f', hash:'c9a1b3f5e2d4a7f8c1b2d3e5', fingerprint:'seg01:c9a1|seg02:b3f5|seg03:e2d4|seg04:a7f8', ipfs:'ipfs://QmNoiNayCoAnh...' },
+  3: { title:'Chạy Ngay Đi', artist:'Sơn Tùng M-TP', royalty:'10%', price:'0.12 ETH', owner:'0xc1d5...9e2a', hash:'f4b2a8c6e1d3b7f5c2a1d4e8', fingerprint:'seg01:f4b2|seg02:a8c6|seg03:e1d3|seg04:b7f5', ipfs:'ipfs://QmChayNgayDi...' },
+};
+
+function randHash() {
+  return Array.from({length:32},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join('');
+}
+function randAddr() {
+  return '0x'+Array.from({length:20},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join('').slice(0,16)+'...'+Math.random().toString(16).slice(2,6);
+}
+function randTx() {
+  return '0x'+Array.from({length:32},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join('').slice(0,64);
+}
+
+function updateStats(key) {
+  stats[key]++;
+  document.getElementById('sb-'+key).textContent = stats[key];
+  document.getElementById('sb-'+key).style.animation = 'none';
+  setTimeout(()=>{ document.getElementById('sb-'+key).style.animation = ''; }, 10);
+}
+
+function connectWallet() {
+  walletConnected = true;
+  document.getElementById('walletBtn').textContent = '0x4f3c...8a1b';
+  document.getElementById('walletBtn').style.background = 'rgba(16,185,129,0.15)';
+  document.getElementById('walletBtn').style.borderColor = 'var(--green)';
+  document.getElementById('walletBtn').style.color = 'var(--green)';
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.studio-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+function updatePreview() {
+  const title = document.getElementById('songName').value || 'Music Copyright NFT';
+  const artist = document.getElementById('artistName').value || 'Nghệ sĩ';
+  document.querySelector('.npc-title').textContent = title;
+  document.querySelector('.npc-sub').textContent = artist + ' · ERC721 · ERC2981';
+}
+
+function handleAudioFile(input) {
+  if(input.files[0]) {
+    audioFileData = input.files[0];
+    const el = document.getElementById('audioUpload');
+    el.classList.add('has-file');
+    el.querySelector('.file-upload-text').textContent = '✓ ' + input.files[0].name;
+    const hash = randHash();
+    const fp = 'seg01:'+hash.slice(0,8)+'|seg02:'+hash.slice(8,16)+'|seg03:'+hash.slice(16,24)+'|seg04:'+hash.slice(24,32);
+    document.getElementById('audioHashBox').style.display = 'block';
+    document.getElementById('audioHashVal').textContent = hash;
+    document.getElementById('fingerprintVal').textContent = fp;
+    const ipfs = 'ipfs://Qm'+randHash().slice(0,44);
+    document.getElementById('metadataUri').value = ipfs;
+    document.getElementById('metadataUri').style.opacity = '1';
+    advanceMintStep(2);
+  }
+}
+function handleDocFile(input) {
+  if(input.files[0]) {
+    const el = document.getElementById('docUpload');
+    el.classList.add('has-file');
+    el.querySelector('.file-upload-text').textContent = '✓ ' + input.files[0].name;
+    advanceMintStep(3);
+  }
+}
+function handleVerifyFile(input) {
+  if(input.files[0]) {
+    verifyFileData = input.files[0];
+    const el = document.getElementById('verifyUpload');
+    el.classList.add('has-file');
+    el.querySelector('.file-upload-text').textContent = '✓ ' + input.files[0].name;
+  }
+}
+function handleFP(input, key) {
+  if(input.files[0]) {
+    if(key==='fp1') fp1Data = input.files[0]; else fp2Data = input.files[0];
+    const el = document.getElementById(key+'Upload');
+    el.classList.add('has-file');
+    el.querySelector('.file-upload-text').textContent = '✓ ' + input.files[0].name;
+  }
+}
+
+function advanceMintStep(n) {
+  for(let i=1;i<=4;i++){
+    const el = document.getElementById('step'+i);
+    if(i < n) { el.classList.remove('active'); el.classList.add('done'); }
+    else if(i === n) { el.classList.add('active'); el.classList.remove('done'); }
+    else { el.classList.remove('active','done'); }
+  }
+}
+
+function setResult(id, msg, type='') {
+  const el = document.getElementById(id);
+  el.className = 'result-box ' + type;
+  el.innerHTML = '<div class="result-scan"></div>' + msg;
+}
+
+async function simulateProgress(label, cb) {
+  const prog = document.getElementById('mintProgress');
+  const fill = document.getElementById('progressFill');
+  const lbl = document.getElementById('progressLabel');
+  const pct = document.getElementById('progressPct');
+  prog.style.display = 'block';
+  const steps = [
+    [20,'Tạo SHA-256 hash...'],
+    [45,'Tạo segment fingerprint...'],
+    [65,'Upload lên IPFS...'],
+    [80,'Gọi Smart Contract...'],
+    [95,'Xác nhận giao dịch...'],
+    [100,'Hoàn thành!'],
+  ];
+  for(const [p,l] of steps) {
+    await new Promise(r=>setTimeout(r,400));
+    fill.style.width = p+'%';
+    lbl.textContent = l;
+    pct.textContent = p+'%';
+  }
+  await new Promise(r=>setTimeout(r,300));
+  prog.style.display = 'none';
+  cb();
+}
+
+function mintNFT() {
+  const name = document.getElementById('songName').value;
+  const artist = document.getElementById('artistName').value;
+  if(!name || !artist) { setResult('mintResult','❌ Vui lòng nhập tên bài hát và nghệ sĩ.','error'); return; }
+  if(!audioFileData) { setResult('mintResult','❌ Vui lòng upload file audio.','error'); return; }
+  setResult('mintResult','','loading');
+  document.getElementById('mintBtn').disabled = true;
+  advanceMintStep(4);
+  simulateProgress('Đang mint...', ()=>{
+    stats.nfts++;
+    updateStats('nfts');
+    const tokenId = stats.nfts;
+    const txHash = randTx();
+    const hash = document.getElementById('audioHashVal').textContent;
+    setResult('mintResult',
+      `✅ <b style="color:var(--green)">NFT đã được mint thành công!</b><br><br>` +
+      `Token ID: <span style="color:var(--accent)">#${String(tokenId).padStart(3,'0')}</span><br>` +
+      `Tx Hash: <span style="color:var(--accent2);font-size:11px;">${txHash}</span><br>` +
+      `Audio Hash: <span style="color:var(--accent);font-size:11px;">${hash}</span><br>` +
+      `Royalty: <span style="color:var(--accent3);">${document.getElementById('royaltyPct').value}%</span>`,
+    'success');
+    document.getElementById('mintBtn').disabled = false;
+  });
+}
+
+function resetMint() {
+  document.getElementById('songName').value='';
+  document.getElementById('artistName').value='';
+  document.getElementById('royaltyPct').value='10';
+  document.getElementById('initPrice').value='0.1';
+  document.getElementById('audioHashBox').style.display='none';
+  ['audioUpload','docUpload'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove('has-file');
+    el.querySelectorAll('.file-upload-text')[0].textContent=id==='audioUpload'?'Kéo thả hoặc click để chọn file nhạc':'Upload hợp đồng bản quyền';
+  });
+  document.getElementById('metadataUri').value='';
+  document.getElementById('metadataUri').style.opacity='0.5';
+  setResult('mintResult','','');
+  document.getElementById('mintResult').innerHTML='<div class="result-scan"></div>Chưa có giao dịch. Điền thông tin và bấm Mint.';
+  advanceMintStep(1);
+  audioFileData=null; docFileData=null;
+}
+
+function searchNFT() {
+  const id = parseInt(document.getElementById('searchTokenId').value);
+  const nft = FAKE_NFTS[id];
+  const card = document.getElementById('searchResult');
+  if(!id) { card.classList.remove('show'); return; }
+  const data = nft || { title:'NFT #'+id, artist:'Artist Unknown', royalty:'--', price:'--', owner:randAddr(), hash:randHash(), fingerprint:'seg01:'+randHash().slice(0,8), ipfs:'ipfs://Qm'+randHash().slice(0,30) };
+  document.getElementById('sr-title').textContent = data.title;
+  document.getElementById('sr-artist').textContent = data.artist;
+  document.getElementById('sr-tags').innerHTML = `<span class="tag tag-blue">Token #${String(id).padStart(3,'0')}</span><span class="tag tag-purple">ERC-721</span><span class="tag tag-green">VERIFIED</span><span class="tag tag-amber">Royalty ${data.royalty}</span>`;
+  document.getElementById('sr-table').innerHTML = `
+    <tr><td style="color:var(--text3);">Title</td><td>${data.title}</td></tr>
+    <tr><td style="color:var(--text3);">Artist</td><td>${data.artist}</td></tr>
+    <tr><td style="color:var(--text3);">Owner</td><td style="color:var(--accent);">${data.owner}</td></tr>
+    <tr><td style="color:var(--text3);">Audio Hash</td><td style="color:var(--accent);font-size:11px;">${data.hash}</td></tr>
+    <tr><td style="color:var(--text3);">Fingerprint</td><td style="color:var(--accent2);font-size:11px;">${data.fingerprint}</td></tr>
+    <tr><td style="color:var(--text3);">Metadata URI</td><td style="color:var(--accent3);font-size:11px;">${data.ipfs}</td></tr>
+    <tr><td style="color:var(--text3);">Royalty</td><td style="color:var(--accent3);">${data.royalty}</td></tr>
+    <tr><td style="color:var(--text3);">Price</td><td style="color:var(--accent);">${data.price}</td></tr>
+  `;
+  card.classList.add('show');
+  updateStats('verify');
+}
+
+function verifyAudio() {
+  const tokenId = document.getElementById('verifyTokenId').value;
+  if(!tokenId || !verifyFileData) {
+    setResult('verifyResult','❌ Vui lòng nhập Token ID và chọn file audio.','error');
+    return;
+  }
+  setResult('verifyResult','','loading');
+  setTimeout(()=>{
+    const isMatch = Math.random() > 0.3;
+    const h1 = randHash();
+    const h2 = isMatch ? h1 : randHash();
+    document.getElementById('vd-hash1').textContent = h1;
+    document.getElementById('vd-hash2').textContent = h2;
+    document.getElementById('vd-time').textContent = new Date().toLocaleString('vi-VN');
+    if(isMatch) {
+      document.getElementById('vd-result').textContent = '✅ MATCH — verifyAudioIntegrity() = true';
+      document.getElementById('vd-result').style.color = 'var(--green)';
+      setResult('verifyResult','✅ <b style="color:var(--green)">Xác minh thành công!</b> Hash khớp 100% với dữ liệu on-chain.<br>verifyAudioIntegrity() = <b>true</b>','success');
+    } else {
+      document.getElementById('vd-result').textContent = '❌ MISMATCH — verifyAudioIntegrity() = false';
+      document.getElementById('vd-result').style.color = 'var(--red)';
+      setResult('verifyResult','❌ <b style="color:var(--red)">Xác minh thất bại!</b> Hash không khớp — file có thể đã bị chỉnh sửa.<br>verifyAudioIntegrity() = <b>false</b>','error');
+    }
+    document.getElementById('verifyDetail').style.display = 'block';
+    updateStats('verify');
+  }, 1800);
+}
+
+function compareFingerprint() {
+  if(!fp1Data || !fp2Data) {
+    const r = document.getElementById('fpResult');
+    r.classList.add('show');
+    document.getElementById('fpIcon').textContent = '⚠️';
+    document.getElementById('fpTitle').textContent = 'Thiếu file';
+    document.getElementById('fpSub').textContent = 'Vui lòng upload cả 2 file audio';
+    return;
+  }
+  const r = document.getElementById('fpResult');
+  r.classList.add('show');
+  document.getElementById('fpIcon').textContent = '⏳';
+  document.getElementById('fpTitle').textContent = 'Đang phân tích...';
+  document.getElementById('fpSub').textContent = 'Đang so sánh fingerprint từng segment';
+  setTimeout(()=>{
+    const similarity = Math.floor(Math.random()*60 + 20);
+    const isCopy = similarity > 60;
+    r.style.borderColor = isCopy ? 'var(--red)' : 'var(--green)';
+    r.style.background = isCopy ? 'rgba(239,68,68,0.05)' : 'rgba(16,185,129,0.05)';
+    document.getElementById('fpIcon').textContent = isCopy ? '🚨' : '✅';
+    document.getElementById('fpTitle').textContent = isCopy ? `ĐẠO NHẠC PHÁT HIỆN — Độ tương đồng ${similarity}%` : `Không có đạo nhạc — Độ tương đồng ${similarity}%`;
+    document.getElementById('fpSub').textContent = isCopy ? 'File thứ 2 có dấu hiệu sử dụng lại âm thanh từ file gốc' : 'Hai file âm thanh có nguồn gốc độc lập';
+    // segments
+    const segs = document.getElementById('fpSegments');
+    segs.innerHTML = '';
+    for(let i=1;i<=8;i++){
+      const match = Math.random() > (isCopy ? 0.4 : 0.7);
+      segs.innerHTML += `<div style="background:var(--bg2);border:1px solid ${match?'var(--red)':'var(--green)'};border-radius:8px;padding:8px;text-align:center;font-size:11px;">
+        <div style="color:${match?'var(--red)':'var(--green)'};font-weight:700;">${match?'MATCH':'DIFF'}</div>
+        <div style="color:var(--text3);margin-top:2px;">seg${String(i).padStart(2,'0')}</div>
+      </div>`;
+    }
+    document.getElementById('fpDetail').style.display = 'block';
+  }, 2000);
+}
+
+function checkRoyalty() {
+  const tokenId = document.getElementById('royaltyTokenId').value;
+  const price = parseFloat(document.getElementById('salePrice').value) || 1;
+  const nft = FAKE_NFTS[tokenId] || { royalty: '8%', title: 'NFT #'+tokenId };
+  const pct = parseInt(nft.royalty) || 8;
+  const amount = (price * pct / 100).toFixed(4);
+  const receiver = randAddr();
+  document.getElementById('ry-pct').textContent = pct + '%';
+  document.getElementById('ry-amount').textContent = amount + ' ETH';
+  document.getElementById('ry-receiver').textContent = receiver;
+  document.getElementById('ry-tokenId').textContent = '#' + String(tokenId).padStart(3,'0');
+  document.getElementById('ry-salePrice').textContent = price + ' ETH';
+  document.getElementById('ry-addr').textContent = receiver;
+  document.getElementById('royaltyDisplay').style.display = 'block';
+  document.getElementById('royaltyDisplay').style.animation = 'fadeUp 0.3s ease both';
+  updateStats('royalty');
+}
+
+function loadOwner() {
+  const id = document.getElementById('transferTokenId').value;
+  const nft = FAKE_NFTS[id];
+  const owner = nft ? nft.owner : randAddr();
+  document.getElementById('currentOwner').value = owner;
+  document.getElementById('fromAddr').value = owner;
+}
+
+function previewTransfer() {
+  const from = document.getElementById('fromAddr').value || '0x???';
+  const to = document.getElementById('toAddr').value || '0x???';
+  const id = document.getElementById('transferTokenId').value || '?';
+  document.getElementById('tf-from').textContent = from;
+  document.getElementById('tf-to').textContent = to;
+  document.getElementById('tf-token').textContent = 'Token #' + id;
+  document.getElementById('transferFlowBox').style.display = 'flex';
+}
+
+function transferNFT() {
+  const tokenId = document.getElementById('transferTokenId').value;
+  const from = document.getElementById('fromAddr').value;
+  const to = document.getElementById('toAddr').value;
+  if(!tokenId || !from || !to) { setResult('transferResult','❌ Vui lòng điền đầy đủ thông tin.','error'); return; }
+  setResult('transferResult','','loading');
+  previewTransfer();
+  setTimeout(()=>{
+    const tx = randTx();
+    setResult('transferResult',
+      `✅ <b style="color:var(--green)">Transfer thành công!</b><br><br>` +
+      `Token ID: <span style="color:var(--accent)">#${String(tokenId).padStart(3,'0')}</span><br>` +
+      `From: <span style="color:var(--text2);font-size:11px;">${from}</span><br>` +
+      `To: <span style="color:var(--accent2);font-size:11px;">${to}</span><br>` +
+      `Tx: <span style="color:var(--accent3);font-size:11px;">${tx}</span>`,
+    'success');
+    updateStats('transfer');
+  }, 1600);
+}
+
+function approveAddr() {
+  const id = document.getElementById('approvalTokenId').value;
+  const addr = document.getElementById('approvedAddr').value;
+  if(!id||!addr){setResult('approvalResult','❌ Vui lòng nhập Token ID và Approved Address.','error');return;}
+  setResult('approvalResult','','loading');
+  setTimeout(()=>{setResult('approvalResult',`✅ <b style="color:var(--green)">Approve thành công!</b><br>Token #${id} → Approved: <span style="color:var(--accent);">${addr}</span><br>Tx: <span style="font-size:11px;color:var(--accent2);">${randTx()}</span>`,'success');},1200);
+}
+function getApproved() {
+  const id = document.getElementById('approvalTokenId').value;
+  if(!id){setResult('approvalResult','❌ Nhập Token ID trước.','error');return;}
+  setResult('approvalResult','','loading');
+  setTimeout(()=>{const addr = randAddr(); setResult('approvalResult',`ℹ️ Token #${id} được approve bởi: <span style="color:var(--accent);">${addr}</span>`,'');},800);
+}
+function setApprovalAll() {
+  const owner = document.getElementById('ownerAddr').value;
+  const op = document.getElementById('operatorAddr').value;
+  if(!owner||!op){setResult('approvalResult','❌ Nhập Owner và Operator Address.','error');return;}
+  setResult('approvalResult','','loading');
+  setTimeout(()=>{setResult('approvalResult',`✅ <b style="color:var(--green)">SetApprovalForAll thành công!</b><br>Owner: <span style="color:var(--text2);font-size:11px;">${owner}</span><br>Operator: <span style="color:var(--accent);font-size:11px;">${op}</span><br>Operator approved: Yes`,'success');},1200);
+}
+function checkOperator() {
+  const owner = document.getElementById('ownerAddr').value;
+  const op = document.getElementById('operatorAddr').value;
+  if(!owner||!op){setResult('approvalResult','❌ Nhập Owner và Operator Address.','error');return;}
+  setResult('approvalResult','','loading');
+  setTimeout(()=>{const approved = Math.random()>0.4; setResult('approvalResult',`Operator approved: <b style="color:${approved?'var(--green)':'var(--red)'};">${approved?'Yes':'No'}</b><br>Owner: <span style="font-size:11px;color:var(--text2);">${owner}</span><br>Operator: <span style="font-size:11px;color:var(--accent);">${op}</span>`,'');},800);
+}
+
+function updateMetadata() {
+  const id = document.getElementById('metaTokenId').value;
+  const uri = document.getElementById('newMetaUri').value;
+  if(!id||!uri){setResult('metadataResult','❌ Vui lòng nhập Token ID và URI mới.','error');return;}
+  setResult('metadataResult','','loading');
+  setTimeout(()=>{setResult('metadataResult',`✅ <b style="color:var(--green)">Metadata URI đã được cập nhật!</b><br>Token #${id}: <span style="color:var(--accent3);font-size:11px;">${uri}</span><br>Tx: <span style="font-size:11px;color:var(--accent2);">${randTx()}</span>`,'success');},1200);
+}
+</script>
+</body>
+</html>

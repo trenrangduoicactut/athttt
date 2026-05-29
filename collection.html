@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Collection — SoundChain</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.page-top {
+  padding: 7rem 2rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* PORTFOLIO STATS */
+.portfolio-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.pstat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.pstat:hover { border-color: var(--border2); }
+.pstat::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.pstat:nth-child(1)::after { background: linear-gradient(90deg, var(--accent), transparent); }
+.pstat:nth-child(2)::after { background: linear-gradient(90deg, var(--accent2), transparent); }
+.pstat:nth-child(3)::after { background: linear-gradient(90deg, var(--green), transparent); }
+.pstat:nth-child(4)::after { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+.pstat-icon { font-size: 20px; margin-bottom: 8px; }
+.pstat-val { font-family: var(--font-display); font-size: 26px; font-weight: 800; margin-bottom: 2px; }
+.pstat-lbl { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; }
+.pstat-change { font-size: 11px; margin-top: 4px; }
+.up { color: var(--green); }
+.down { color: var(--red); }
+
+/* TABS */
+.col-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+.col-tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.col-tab:hover { color: var(--text2); }
+.col-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* NFT GRID */
+.owned-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.owned-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.25s;
+  position: relative;
+  cursor: pointer;
+}
+.owned-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.owned-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.owned-actions {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.owned-card:hover .owned-actions { opacity: 1; }
+.owned-action-btn {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-mono);
+}
+.owned-action-btn.sell { background: var(--accent); color: var(--bg); }
+.owned-action-btn.transfer { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+
+.owned-info { padding: 12px; }
+.owned-artist { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+.owned-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.owned-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+.owned-val { font-size: 12px; color: var(--accent); font-weight: 700; }
+.owned-val-label { font-size: 10px; color: var(--text3); margin-bottom: 1px; }
+.owned-pnl { font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+.owned-pnl.pos { background: rgba(16,185,129,0.12); color: var(--green); }
+.owned-pnl.neg { background: rgba(239,68,68,0.12); color: var(--red); }
+
+/* HISTORY PANEL */
+.history-panel { display: none; }
+.history-panel.active { display: block; }
+.owned-grid-panel { display: none; }
+.owned-grid-panel.active { display: block; }
+.royalties-panel { display: none; }
+.royalties-panel.active { display: block; }
+
+/* TIMELINE */
+.timeline { position: relative; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+}
+
+.tx-item {
+  display: flex;
+  gap: 1rem;
+  padding: 0 0 1.5rem 0;
+  animation: fadeUp 0.4s ease both;
+}
+
+.tx-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+  background: var(--card);
+  position: relative;
+  z-index: 1;
+}
+
+.tx-body {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: border-color 0.2s;
+}
+.tx-body:hover { border-color: var(--border2); }
+
+.tx-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+.tx-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+.tx-time { font-size: 11px; color: var(--text3); }
+.tx-detail { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.tx-hash { font-size: 10px; color: var(--accent2); margin-top: 4px; font-family: var(--font-mono); }
+
+/* ROYALTY TABLE */
+.royalty-table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rtable { width: 100%; border-collapse: collapse; }
+.rtable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  text-transform: uppercase;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.rtable td {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.rtable tr:last-child td { border-bottom: none; }
+.rtable tr:hover td { background: rgba(99,210,255,0.03); }
+
+/* SELL MODAL */
+.sell-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.sell-modal.open { display: flex; }
+.sell-modal-box {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 440px;
+  animation: fadeUp 0.3s ease;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .portfolio-stats { grid-template-columns: repeat(2,1fr); }
+  .owned-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="orb" style="width:500px;height:500px;background:rgba(99,210,255,0.03);top:5%;left:-150px;"></div>
+<div class="orb" style="width:400px;height:400px;background:rgba(168,85,247,0.04);bottom:20%;right:-100px;"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Sound<span>Chain</span></a>
+  <ul class="nav-links">
+    <li><a href="marketplace.html">Marketplace</a></li>
+    <li><a href="artist.html">Artist Studio</a></li>
+    <li><a href="collection.html" class="active">My Collection</a></li>
+  </ul>
+  <div class="nav-right">
+    <span style="font-size:11px;color:var(--text3);">Sepolia Testnet</span>
+    <a href="#" class="btn btn-outline btn-sm">0x4f3c...8a1b</a>
+  </div>
+</nav>
+
+<div class="page-top">
+  <!-- HEADER -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;">🎵</div>
+        <div>
+          <div style="font-size:12px;color:var(--text3);">Ví của bạn</div>
+          <div style="font-family:var(--font-mono);font-size:13px;color:var(--accent);">0x4f3c8b2a...e19d8a1b</div>
+        </div>
+      </div>
+      <h1 style="font-family:var(--font-display);font-size:32px;font-weight:800;">My Collection</h1>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="marketplace.html" class="btn btn-outline btn-sm">+ Mua thêm</a>
+      <a href="artist.html" class="btn btn-primary btn-sm">Mint NFT mới ⚡</a>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO STATS -->
+  <div class="portfolio-stats">
+    <div class="pstat">
+      <div class="pstat-icon">🎵</div>
+      <div class="pstat-val" style="color:var(--accent);">8</div>
+      <div class="pstat-lbl">NFTs sở hữu</div>
+      <div class="pstat-change up">↑ +2 tháng này</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-icon">💎</div>
+      <div class="pstat-val" style="color:var(--accent2);">0.94 ETH</div>
+      <div class="pstat-lbl">Tổng giá trị</div>
+      <div class="pstat-change up">↑ +12.4%</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-icon">💰</div>
+      <div class="pstat-val" style="color:var(--green);">0.18 ETH</div>
+      <div class="pstat-lbl">Royalties nhận được</div>
+      <div class="pstat-change up">↑ +0.02 tuần này</div>
+    </div>
+    <div class="pstat">
+      <div class="pstat-icon">🔄</div>
+      <div class="pstat-val" style="color:var(--accent3);">14</div>
+      <div class="pstat-lbl">Giao dịch</div>
+      <div class="pstat-change" style="color:var(--text3);">All time</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="col-tabs">
+    <div class="col-tab active" onclick="switchColTab('owned',this)">NFT sở hữu (8)</div>
+    <div class="col-tab" onclick="switchColTab('history',this)">Lịch sử giao dịch (14)</div>
+    <div class="col-tab" onclick="switchColTab('royalties',this)">Royalties nhận được</div>
+  </div>
+
+  <!-- OWNED PANEL -->
+  <div class="owned-grid-panel active" id="panel-owned">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:12px;color:var(--text3);">8 NFTs · Giá trị tổng: 0.94 ETH</span>
+      <div style="display:flex;gap:8px;">
+        <select style="width:auto;font-size:12px;padding:6px 10px;">
+          <option>Sắp xếp: Mới nhất</option>
+          <option>Giá trị: Cao nhất</option>
+          <option>P&L tốt nhất</option>
+        </select>
+      </div>
+    </div>
+    <div class="owned-grid" id="ownedGrid"></div>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div class="history-panel" id="panel-history">
+    <div class="timeline" id="historyTimeline"></div>
+  </div>
+
+  <!-- ROYALTIES PANEL -->
+  <div class="royalties-panel" id="panel-royalties">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-family:var(--font-display);font-size:18px;font-weight:800;">Tổng royalties: <span style="color:var(--green);">0.18 ETH</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Tự động nhận qua ERC-2981 Smart Contract</div>
+      </div>
+      <span class="tag tag-green">ERC-2981 ✓</span>
+    </div>
+    <div class="royalty-table-wrap">
+      <table class="rtable" id="royaltyTable"></table>
+    </div>
+  </div>
+</div>
+
+<!-- SELL MODAL -->
+<div class="sell-modal" id="sellModal">
+  <div class="sell-modal-box">
+    <button onclick="closeSellModal()" style="position:absolute;top:12px;right:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text2);width:28px;height:28px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">×</button>
+    <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Đăng bán NFT</div>
+    <h3 style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px;" id="sellModalTitle"></h3>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:1.5rem;" id="sellModalArtist"></p>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:block;">Giá bán (ETH)</label>
+      <input type="number" id="sellPrice" step="0.01" value="0.15" style="font-size:16px;padding:12px 14px;">
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:1.5rem;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Royalty cho tác giả</span><span id="sellRoyaltyCut" style="color:var(--accent3);"></span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Phí platform (2.5%)</span><span id="sellPlatformCut"></span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;color:var(--text);border-top:1px solid var(--border);padding-top:8px;margin-top:8px;"><span>Bạn nhận</span><span id="sellYouGet" style="color:var(--green);"></span></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="confirmSell()">⚡ Đăng bán ngay</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:2rem;right:2rem;background:var(--card2);border:1px solid var(--green);border-radius:12px;padding:1rem 1.5rem;z-index:300;font-size:13px;transform:translateX(120%);transition:transform 0.3s ease;min-width:260px;">
+  <div style="font-weight:700;color:var(--green);margin-bottom:4px;" id="toastTitle">✅ Thành công</div>
+  <div id="toastMsg" style="font-size:12px;color:var(--text2);"></div>
+</div>
+
+<script>
+const ownedNFTs = [
+  {id:1,emoji:'🎵',bg:'linear-gradient(135deg,#1a1040,#2d1060)',title:'Mưa Hồng',artist:'Trịnh Công Sơn',bought:'0.06',current:'0.09',royalty:'8%'},
+  {id:2,emoji:'🎸',bg:'linear-gradient(135deg,#0a2040,#103060)',title:'Nơi Này Có Anh',artist:'Sơn Tùng M-TP',bought:'0.12',current:'0.18',royalty:'10%'},
+  {id:3,emoji:'🥁',bg:'linear-gradient(135deg,#280008,#500010)',title:'Đường Tôi Chở Em Về',artist:'Hà Anh Tuấn',bought:'0.05',current:'0.08',royalty:'6%'},
+  {id:4,emoji:'🎤',bg:'linear-gradient(135deg,#0a2818,#0f4020)',title:'Người Lạ Ơi',artist:'Karik ft. Orange',bought:'0.07',current:'0.10',royalty:'7%'},
+  {id:5,emoji:'🎹',bg:'linear-gradient(135deg,#200a30,#400860)',title:'Chạy Ngay Đi',artist:'Sơn Tùng M-TP',bought:'0.10',current:'0.13',royalty:'10%'},
+  {id:6,emoji:'🎻',bg:'linear-gradient(135deg,#1e0818,#3a1030)',title:'Em Của Ngày Hôm Qua',artist:'Suni Hạ Linh',bought:'0.04',current:'0.06',royalty:'5%'},
+  {id:7,emoji:'🎧',bg:'linear-gradient(135deg,#101018,#202040)',title:'Yêu Một Người Có Lẽ',artist:'Mono',bought:'0.09',current:'0.14',royalty:'9%'},
+  {id:8,emoji:'🎺',bg:'linear-gradient(135deg,#001828,#003050)',title:'Từng Là',artist:'Hà Anh Tuấn',bought:'0.08',current:'0.16',royalty:'6%'},
+];
+
+const txHistory = [
+  {icon:'💰',type:'MUA',title:'Mua "Yêu Một Người Có Lẽ"',time:'29/05/2025 14:22',detail:'Mua từ 0xb2e4...3d7f · Giá: 0.09 ETH',hash:'0x1a2b3c4d5e6f7a8b...'},
+  {icon:'💎',type:'ROYALTY',title:'Nhận royalty từ "Nơi Này Có Anh"',time:'28/05/2025 09:11',detail:'Giao dịch thứ cấp 0.18 ETH · Royalty 10%: 0.018 ETH',hash:'0x9f8e7d6c5b4a3210...'},
+  {icon:'💰',type:'MUA',title:'Mua "Từng Là"',time:'25/05/2025 16:45',detail:'Mua từ 0xf1b3...2a9d · Giá: 0.08 ETH',hash:'0x3c4d5e6f7a8b9c0d...'},
+  {icon:'🔄',type:'TRANSFER',title:'Transfer "Người Lạ Ơi"',time:'20/05/2025 11:30',detail:'Nhận từ 0xd3f1...5c8b · Phí gas: 0.002 ETH',hash:'0x5e6f7a8b9c0d1e2f...'},
+  {icon:'💎',type:'ROYALTY',title:'Nhận royalty từ "Chạy Ngay Đi"',time:'18/05/2025 08:00',detail:'Giao dịch thứ cấp 0.12 ETH · Royalty 10%: 0.012 ETH',hash:'0x7a8b9c0d1e2f3a4b...'},
+  {icon:'💰',type:'MUA',title:'Mua "Chạy Ngay Đi"',time:'15/05/2025 20:15',detail:'Mua từ 0xc1d5...9e2a · Giá: 0.10 ETH',hash:'0x9c0d1e2f3a4b5c6d...'},
+  {icon:'💰',type:'MUA',title:'Mua "Mưa Hồng"',time:'10/05/2025 13:05',detail:'Mua từ 0xa4c2...8f3e · Giá: 0.06 ETH',hash:'0xb5c6d7e8f9a0b1c2...'},
+  {icon:'💰',type:'MUA',title:'Mua "Nơi Này Có Anh"',time:'05/05/2025 17:33',detail:'Mua từ 0xb2e4...3d7f · Giá: 0.12 ETH',hash:'0xd7e8f9a0b1c2d3e4...'},
+];
+
+const royaltyRows = [
+  {nft:'Nơi Này Có Anh',date:'28/05/2025',salePrice:'0.18 ETH',royaltyPct:'10%',received:'0.018 ETH',from:'0xb2e4...3d7f'},
+  {nft:'Chạy Ngay Đi',date:'18/05/2025',salePrice:'0.12 ETH',royaltyPct:'10%',received:'0.012 ETH',from:'0xc1d5...9e2a'},
+  {nft:'Nơi Này Có Anh',date:'10/05/2025',salePrice:'0.15 ETH',royaltyPct:'10%',received:'0.015 ETH',from:'0xa9f3...4b2e'},
+  {nft:'Mưa Hồng',date:'05/05/2025',salePrice:'0.09 ETH',royaltyPct:'8%',received:'0.0072 ETH',from:'0xf7d1...9c3a'},
+  {nft:'Em Của Ngày Hôm Qua',date:'01/05/2025',salePrice:'0.06 ETH',royaltyPct:'5%',received:'0.003 ETH',from:'0xe3b8...7f1d'},
+  {nft:'Người Lạ Ơi',date:'25/04/2025',salePrice:'0.10 ETH',royaltyPct:'7%',received:'0.007 ETH',from:'0xd2c7...8a4b'},
+  {nft:'Từng Là',date:'20/04/2025',salePrice:'0.11 ETH',royaltyPct:'6%',received:'0.0066 ETH',from:'0xb1a9...3e7f'},
+  {nft:'Yêu Một Người Có Lẽ',date:'15/04/2025',salePrice:'0.14 ETH',royaltyPct:'9%',received:'0.0126 ETH',from:'0xa8f2...5c1d'},
+];
+
+const typeBadge = {
+  'MUA':'tag-blue',
+  'ROYALTY':'tag-green',
+  'TRANSFER':'tag-amber',
+  'BÁN':'tag-purple',
+};
+
+function renderOwned() {
+  document.getElementById('ownedGrid').innerHTML = ownedNFTs.map((n,i) => {
+    const pnl = ((parseFloat(n.current) - parseFloat(n.bought)) / parseFloat(n.bought) * 100).toFixed(1);
+    const isPos = pnl >= 0;
+    return `<div class="owned-card" style="animation-delay:${i*0.05}s;animation:fadeUp 0.4s ease both;">
+      <div class="owned-cover" style="background:${n.bg}">
+        ${n.emoji}
+        <div class="owned-actions">
+          <button class="owned-action-btn sell" onclick="openSell(${n.id},event)">Bán</button>
+          <button class="owned-action-btn transfer" onclick="goTransfer(event)">Transfer</button>
+        </div>
+      </div>
+      <div class="owned-info">
+        <div class="owned-artist">${n.artist}</div>
+        <div class="owned-title">${n.title}</div>
+        <div class="owned-footer">
+          <div>
+            <div class="owned-val-label">GIÁ TRỊ</div>
+            <div class="owned-val">${n.current} ETH</div>
+          </div>
+          <div class="owned-pnl ${isPos?'pos':'neg'}">${isPos?'+':''}${pnl}%</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderHistory() {
+  document.getElementById('historyTimeline').innerHTML = txHistory.map((tx,i) => {
+    const badgeClass = typeBadge[tx.type] || 'tag-blue';
+    return `<div class="tx-item" style="animation-delay:${i*0.06}s;">
+      <div class="tx-dot">${tx.icon}</div>
+      <div class="tx-body">
+        <div class="tx-header">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="tag ${badgeClass}" style="font-size:10px;">${tx.type}</span>
+            <span class="tx-title">${tx.title}</span>
+          </div>
+          <span class="tx-time">${tx.time}</span>
+        </div>
+        <div class="tx-detail">${tx.detail}</div>
+        <div class="tx-hash">Tx: ${tx.hash}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRoyalties() {
+  document.getElementById('royaltyTable').innerHTML =
+    `<thead><tr>
+      <th>NFT</th><th>Ngày</th><th>Sale Price</th><th>Royalty %</th><th>Nhận được</th><th>Buyer</th>
+    </tr></thead><tbody>` +
+    royaltyRows.map((r,i) => `<tr style="animation:fadeUp 0.4s ${i*0.05}s ease both;">
+      <td style="font-family:var(--font-display);font-weight:700;">${r.nft}</td>
+      <td style="color:var(--text3);">${r.date}</td>
+      <td style="color:var(--text2);">${r.salePrice}</td>
+      <td><span class="tag tag-amber" style="font-size:10px;">${r.royaltyPct}</span></td>
+      <td style="color:var(--green);font-weight:700;">${r.received}</td>
+      <td style="color:var(--accent);font-size:11px;">${r.from}</td>
+    </tr>`).join('') + '</tbody>';
+}
+
+function switchColTab(tab, el) {
+  document.querySelectorAll('.col-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['owned','history','royalties'].forEach(p=>{
+    document.getElementById('panel-'+p).classList.remove('active');
+  });
+  if(tab==='owned') document.getElementById('panel-owned').classList.add('active');
+  else if(tab==='history') document.getElementById('panel-history').classList.add('active');
+  else if(tab==='royalties') document.getElementById('panel-royalties').classList.add('active');
+}
+
+let currentSellNFT = null;
+function openSell(id, e) {
+  e.stopPropagation();
+  currentSellNFT = ownedNFTs.find(n=>n.id===id);
+  document.getElementById('sellModalTitle').textContent = currentSellNFT.title;
+  document.getElementById('sellModalArtist').textContent = currentSellNFT.artist;
+  document.getElementById('sellPrice').value = currentSellNFT.current;
+  calcSell();
+  document.getElementById('sellModal').classList.add('open');
+}
+document.addEventListener('input', e=>{ if(e.target.id==='sellPrice') calcSell(); });
+function calcSell() {
+  const price = parseFloat(document.getElementById('sellPrice').value)||0;
+  const royaltyPct = currentSellNFT ? parseInt(currentSellNFT.royalty) : 8;
+  const royaltyCut = (price*royaltyPct/100).toFixed(4);
+  const platformCut = (price*0.025).toFixed(4);
+  const youGet = (price - parseFloat(royaltyCut) - parseFloat(platformCut)).toFixed(4);
+  document.getElementById('sellRoyaltyCut').textContent = `-${royaltyCut} ETH (${royaltyPct}%)`;
+  document.getElementById('sellPlatformCut').textContent = `-${platformCut} ETH`;
+  document.getElementById('sellYouGet').textContent = `${youGet} ETH`;
+}
+function closeSellModal() { document.getElementById('sellModal').classList.remove('open'); }
+function confirmSell() {
+  closeSellModal();
+  showToast('✅ Đã đăng bán thành công!', `"${currentSellNFT.title}" · Giá: ${document.getElementById('sellPrice').value} ETH`);
+}
+function goTransfer(e) { e.stopPropagation(); window.location.href='artist.html'; }
+document.getElementById('sellModal').addEventListener('click',e=>{if(e.target===document.getElementById('sellModal'))closeSellModal();});
+
+function showToast(title, msg) {
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.style.transform = 'translateX(0)';
+  setTimeout(()=>t.style.transform='translateX(120%)', 3500);
+}
+
+renderOwned();
+renderHistory();
+renderRoyalties();
+</script>
+</body>
+</html>
